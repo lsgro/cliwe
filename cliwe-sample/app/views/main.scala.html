@@ -1,0 +1,18 @@
+@(title: String)
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <script src="@routes.Assets.at("javascripts/jquery-1.11.1.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("cliwe-js/cliwe.js")" type="text/javascript"></script>
+        <script type="text/javascript">$(function(){$(".cliwe-terminal").cliwe()})</script>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("cliwe-css/cliwe.css")">
+    <body>
+        <div class="command-line-frame">
+            <div class="cliwe-larder"></div>
+            <div class="cliwe-terminal"></div>
+        </div>
+    </body>
+</html>

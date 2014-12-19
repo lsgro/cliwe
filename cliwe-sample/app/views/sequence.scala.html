@@ -1,0 +1,8 @@
+@(s: Seq[Any], id: String)
+
+<p>@id:</p>
+<table>
+@for(x <- s){
+    <tr><td>@x.toString</td></tr>
+}
+</table>

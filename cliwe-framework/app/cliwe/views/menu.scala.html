@@ -1,0 +1,7 @@
+@(items: Seq[String])
+
+<menu>
+    @for(item <- items) {
+        <menuItem label="@item"></menuItem>
+    }
+</menu>

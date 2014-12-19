@@ -1,0 +1,7 @@
+@(lines: String, cls: String)
+
+<div class="@cls cliwe-section">
+    @for(line <- lines.split("\\n")) {
+        <div class="@cls cliwe-line">@line</div>
+    }
+</div>

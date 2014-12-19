@@ -1,0 +1,9 @@
+@(content: Html)
+
+<div class="cliwe-detachable">
+    <img class="cliwe-top-right-decoration cliwe-show-in-terminal" src="@routes.Assets.at("cliwe-icons/pin.png")"
+         onclick="var div = $(this).parent(); div.detach();$('.cliwe-larder').append(div)">
+    <img class="cliwe-top-right-decoration cliwe-show-in-larder" src="@routes.Assets.at("cliwe-icons/delete.png")"
+         onclick="var div = $(this).parent(); div.remove()">
+    @content
+</div>

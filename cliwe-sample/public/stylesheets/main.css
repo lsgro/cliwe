@@ -1,0 +1,26 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: "Courier New", Courier, monospace;
+}
+
+.command-line-frame {
+    display: flex;
+    height: 100%;
+}
+
+.cliwe-terminal {
+    order: 1;
+    width: 50%;
+    height: 100%;
+    overflow: auto;
+}
+
+.cliwe-larder {
+    order: 2;
+    width: 50%;
+}

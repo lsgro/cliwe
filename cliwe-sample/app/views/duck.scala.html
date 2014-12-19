@@ -1,0 +1,5 @@
+@(me: model.Duck, objectId: String)
+
+<img src="@routes.Assets.at("images/duck.jpg")" width="40px" height="40px">
+My ID is: @objectId
+<button onclick="$('.cliwe-terminal').cliwe('callObjectMethod', '@objectId', 'quack'); this.blur()">Quack</button><!-- important! blur on click to avoid <SPACE> triggering it again -->

@@ -1,0 +1,11 @@
+@(stderr: String, stdout: String, result: Html)
+
+@if(stderr.nonEmpty) {
+    @detachable(section(stderr, "cliwe-error"))
+}
+
+@if(stdout.nonEmpty) {
+    @detachable(section(stdout, "cliwe-output"))
+}
+
+@detachable(result)

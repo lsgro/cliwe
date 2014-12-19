@@ -1,0 +1,73 @@
+
+.cliwe-error {
+    color: red;
+}
+
+.cliwe-output {
+    color: blue;
+}
+
+span,div {
+    margin: 0;
+    padding: 0;
+}
+
+table {
+    border: #ccc 1px solid;
+    border-radius: 6px;
+    padding: 0;
+}
+
+table tr {
+    margin: 0;
+    padding: 0;
+}
+
+table td {
+    margin: 0;
+    padding: 0;
+    background: #e2e2e2;
+}
+
+div.cliwe-line {
+    position: relative;
+}
+
+div.cliwe-detachable {
+    position: relative;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 5px;
+    transition: border-color .5s ease-in-out;
+    -webkit-transition: border-color .5s ease-in-out;
+    overflow: auto;
+}
+
+div.cliwe-detachable:hover {
+    border-color: #ccc;
+}
+
+img.cliwe-top-right-decoration {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 10px;
+}
+
+.cliwe-terminal img.cliwe-show-in-terminal {
+    display: block;
+}
+
+.cliwe-terminal img.cliwe-show-in-larder {
+    display: none;
+}
+
+.cliwe-larder img.cliwe-show-in-terminal {
+    display: none;
+}
+
+.cliwe-larder img.cliwe-show-in-larder {
+    display: block;
+}
+
