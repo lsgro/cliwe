@@ -1,13 +1,18 @@
 package cliwe
 
-import java.util.concurrent.Callable
-import javax.script.{ScriptContext, ScriptEngineManager, ScriptEngine}
+import play.api.Play.current
+import play.api.cache.Cache
 
-import play.cache.Cache
+import javax.script.{ScriptContext, ScriptEngineManager, ScriptEngine}
 
 import scala.annotation.tailrec
 
 trait JavaScriptEngine {
+
+  // persistence
+  def loadLastResultNumber(sessionUniqueId: String): Option[Int]
+  def saveLastResultNumber(sessionUniqueId: String, n: Int): Unit
+
   def executeOrHint(fragment: String, context: ScriptContext, sessionUniqueId: String): ScriptResult =
     if (fragment.endsWith("\n")) {
       val result = scriptExecutor(sessionUniqueId).eval(fragment, context)
@@ -22,17 +27,17 @@ trait JavaScriptEngine {
       ScriptCompletions(Nil)
     }
 
-  private def scriptExecutor(sessionUniqueId: String): ScriptEngine = Cache.getOrElse("cliweScriptEngine", new Callable[ScriptEngine] {
-    def call = { new ScriptEngineManager(null).getEngineByName("JavaScript") }
-  }, 0)
+  private def scriptExecutor(sessionUniqueId: String): ScriptEngine = Cache.getOrElse(s"cliweScriptEngine-$sessionUniqueId") {
+    new ScriptEngineManager(null).getEngineByName("JavaScript")
+  }
 
   private lazy val identifierRegex = """[a-zA-Z$_][0-9a-zA-Z$_]*""".r
   def isBareIdentifier(fragment: String) = identifierRegex.pattern.matcher(fragment).matches()
 
   private def nextResultId(sessionUniqueId: String, context: ScriptContext): String = {
-    val resNumberCandidate = Option(Cache.get(s"resNo-$sessionUniqueId").asInstanceOf[Int]).map(_ + 1).getOrElse(0)
+    val resNumberCandidate = loadLastResultNumber(sessionUniqueId).map(_ + 1).getOrElse(0)
     val resNumber = findFirstUnusedResVariableNumber(resNumberCandidate, context) // avoid conflicts with user variables
-    Cache.set(s"resNo-$sessionUniqueId", resNumber)
+    saveLastResultNumber(sessionUniqueId, resNumber)
     s"res$resNumber"
   }
 

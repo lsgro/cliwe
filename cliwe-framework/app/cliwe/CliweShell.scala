@@ -2,14 +2,12 @@ package cliwe
 
 import java.io.{PrintWriter, StringWriter}
 import java.util.UUID
-import java.util.concurrent.Callable
 import javax.script.{SimpleScriptContext, ScriptContext}
 import javax.script.ScriptContext._
 
 import play.api.mvc._
 import play.api.mvc.Results.{Ok, BadRequest}
 import play.api.templates.Html
-import play.cache.Cache
 
 import scala.util.{Failure, Success, Try}
 
@@ -21,23 +19,28 @@ trait CliweShell {
   // client code
   def renderResult: PartialFunction[(Any, String), Html]
 
+  // persistence
+  def loadScriptContext(sessionUniqueId: String): Option[ScriptContext]
+  def saveScriptContext(sessionUniqueId: String, context: ScriptContext): Unit
+
   // action
   def shell = Action {
     request =>
       val sessionUniqueId = getOrElseUniqueId(request)
       val responseData = request.body.asFormUrlEncoded.map(_.toSeq).collect {
         case Seq(("commandBuffer", Seq(commandBuffer))) =>
-          Ok(applyScriptFragment(commandBuffer, getOrElseContext(sessionUniqueId), sessionUniqueId))
+          Ok(applyScriptFragment(commandBuffer, sessionUniqueId))
       }
       responseData.getOrElse(BadRequest("commandBuffer argument not set")).withSession("uniqueId" -> sessionUniqueId)
   }
 
-  private def applyScriptFragment(fragment: String, context: ScriptContext, sessionUniqueId: String): Html = {
+  private def applyScriptFragment(fragment: String, sessionUniqueId: String): Html = {
+    val context = getOrElseContext(sessionUniqueId)
     val outputWriter = new StringWriter()
     val errorWriter = new StringWriter()
     context.setWriter(outputWriter)
     context.setErrorWriter(errorWriter)
-    Try(executeOrHint(fragment, context, sessionUniqueId)) match {
+    val html = Try(executeOrHint(fragment, context, sessionUniqueId)) match {
       case Success(ScriptValue(result, resultId)) =>
         registerInContext(result, resultId, context)
         val output = outputWriter.toString
@@ -49,6 +52,8 @@ trait CliweShell {
       case Failure(exception) =>
         cliwe.views.html.response(cliwe.views.html.stacktrace(extractStackTrace(exception)))
     }
+    saveScriptContext(sessionUniqueId, context)
+    html
   }
 
   private def renderResultWithDefault(result: Any, resultId: String) =
@@ -73,10 +78,7 @@ trait CliweShell {
     context.setAttribute(id, obj, ENGINE_SCOPE)
   }
 
-  private def getOrElseContext(uniqueId: String): ScriptContext =
-    Cache.getOrElse(uniqueId, new Callable[ScriptContext] {
-      def call = {
-        new SimpleScriptContext
-      }
-    }, 0)
+  private def getOrElseContext(sessionUniqueId: String): ScriptContext = {
+    loadScriptContext(sessionUniqueId).getOrElse(new SimpleScriptContext)
+  }
 }

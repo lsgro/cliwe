@@ -3,9 +3,9 @@ package controllers
 import model.Duck
 import play.api.mvc._
 import play.api.templates.Html
-import cliwe.{JavaScriptEngine, CliweShell}
+import cliwe.{DevCacheOnlyPersistence, JavaScriptEngine, CliweShell}
 
-object Application extends Controller with CliweShell with JavaScriptEngine {
+object Application extends Controller with CliweShell with JavaScriptEngine with DevCacheOnlyPersistence {
 
   def index = Action {
     Ok(views.html.main("Cliwe!"))
