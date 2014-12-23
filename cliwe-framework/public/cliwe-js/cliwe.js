@@ -26,8 +26,8 @@
         } else {
             options = $.extend( {}, $.fn.cliwe.defaultOptions, methodOrOptions );
 
-            $(document).unbind('keydown').bind('keydown', processSpecialKey);
-            $(document).keypress(processKey);
+            $(document).on("keypress", processKey);
+            $(document).on("keydown", processSpecialKey);
 
             setBlink(caretElement, 500);
 
@@ -79,9 +79,11 @@
         // private methods
 
         function processKey(event) {
-            var charCode = event.which;
-            processChar(charCode === 13 ? 10 : charCode); // convert '\r' to '\n'
-            event.preventDefault();
+            if (event.target.tagName === "BODY") {
+                var charCode = event.which;
+                processChar(charCode === 13 ? 10 : charCode); // convert '\r' to '\n'
+                event.preventDefault();
+            }
         }
 
         function processChar(charCode) {
@@ -102,21 +104,23 @@
         }
 
         function processSpecialKey(event) {
-            if (event.keyCode === 8) { // backspace
-                removeCurrentChar();
-                event.preventDefault();
-                processCommandBuffer();
-            }
-            else if (event.keyCode === 37) { // arrow left
-                moveLeft();
-                event.preventDefault();
-            }
-            else if (event.keyCode === 39) { // arrow right
-                moveRight();
-                event.preventDefault();
-            }
-            else if (event.keyCode === 9) {
-                event.preventDefault();
+            if (event.target.tagName === "BODY") {
+                if (event.keyCode === 8) { // backspace
+                    removeCurrentChar();
+                    event.preventDefault();
+                    processCommandBuffer();
+                }
+                else if (event.keyCode === 37) { // arrow left
+                    moveLeft();
+                    event.preventDefault();
+                }
+                else if (event.keyCode === 39) { // arrow right
+                    moveRight();
+                    event.preventDefault();
+                }
+                else if (event.keyCode === 9) {
+                    event.preventDefault();
+                }
             }
         }
 
@@ -128,8 +132,7 @@
         function joinBufferLines(buffer) {
             var fragment = "";
             for (var line = 0; line < buffer.length; line++) {
-                var lineText = convertBufferLineToText(buffer[line]);
-                fragment += lineText;
+                fragment += convertBufferLineToText(buffer[line]);
                 if (line < buffer.length - 1) { // more lines available
                     fragment += "\n";
                 }
@@ -141,13 +144,15 @@
             var lineText = "",
                 charSpans = domLine.children("span.cliwe-char").toArray();
             for (var pos = 0; pos < charSpans.length; pos++) { // skip line prompt
-                var c = charSpans[pos].childNodes[0].nodeValue;
-                if (c == "&nbsp;") {
-                    lineText += " ";
-                } else {
-                    lineText += c;
+                if (charSpans[pos].childNodes.length > 0) {
+                    var c = charSpans[pos].childNodes[0].nodeValue;
+                    if (c == "&nbsp;") {
+                        lineText += " ";
+                    } else {
+                        lineText += c;
+                    }
                 }
-            }
+           }
             return lineText;
         }
 

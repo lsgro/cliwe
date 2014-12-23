@@ -47,8 +47,8 @@ trait CliweShell {
         val error = errorWriter.toString
         val renderedResult = renderResultWithDefault(result, resultId)
         cliwe.views.html.response(cliwe.views.html.outandresult(error, output, renderedResult))
-      case Success(ScriptCompletions(proposals)) =>
-        cliwe.views.html.menu(proposals)
+      case Success(ScriptCompletions(suggestions)) =>
+        cliwe.views.html.menu(suggestions)
       case Failure(exception) =>
         cliwe.views.html.response(cliwe.views.html.stacktrace(extractStackTrace(exception)))
     }
