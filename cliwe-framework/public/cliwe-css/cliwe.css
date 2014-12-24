@@ -71,3 +71,10 @@ img.cliwe-top-right-decoration {
     display: block;
 }
 
+.cliwe-suggestions {
+    position: absolute;
+    z-index: 100;
+    font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+    font-size: 14px;
+    overflow: scroll;
+}

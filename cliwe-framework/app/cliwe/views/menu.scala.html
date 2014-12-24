@@ -1,7 +1,7 @@
-@(items: Seq[String])
+@(items: Seq[_root_.cliwe.CompletionFragment])
 
-<menu>
+<menu class="cliwe-menu">
     @for(item <- items) {
-        <menuItem label="@item"></menuItem>
+        <menuItem class="cliwe-menu-item" data-insert-offset="@{item.insertionOffset}">@{item.fragment}</menuItem>
     }
 </menu>

@@ -24,3 +24,18 @@ body {
     order: 2;
     width: 50%;
 }
+
+.cliwe-suggestions {
+    color: cornflowerblue;
+    background-color: lightgray;
+}
+
+.cliwe-selected {
+    color: white;
+    background-color: cornflowerblue;
+}
+
+.cliwe-suggestion:hover {
+    color: white;
+    background-color: cadetblue;
+}
