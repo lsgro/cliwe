@@ -12,12 +12,13 @@ import play.api.templates.Html
 import scala.util.{Failure, Success, Try}
 
 trait CliweShell {
+  case class ResultWithId(result: Any, id: String)
 
   // script framework
   def executeOrHint(fragment: String, context: ScriptContext, sessionUniqueId: String): ScriptResult
 
   // client code
-  def renderResult: PartialFunction[(Any, String), Html]
+  def renderResult: PartialFunction[ResultWithId, Html]
 
   // persistence
   def loadScriptContext(sessionUniqueId: String): Option[ScriptContext]
@@ -45,7 +46,7 @@ trait CliweShell {
         registerInContext(result, resultId, context)
         val output = outputWriter.toString
         val error = errorWriter.toString
-        val renderedResult = renderResultWithDefault(result, resultId)
+        val renderedResult = renderResultWithDefault(ResultWithId(result, resultId))
         cliwe.views.html.response(cliwe.views.html.outandresult(error, output, renderedResult))
       case Success(ScriptCompletions(suggestions)) =>
         cliwe.views.html.menu(suggestions)
@@ -56,10 +57,10 @@ trait CliweShell {
     html
   }
 
-  private def renderResultWithDefault(result: Any, resultId: String) =
-    if (renderResult.isDefinedAt(result, resultId)) renderResult(result, resultId)
+  private def renderResultWithDefault(resultWithId: ResultWithId) =
+    if (renderResult.isDefinedAt(resultWithId)) renderResult(resultWithId)
     else Html(
-      result match {
+      resultWithId.result match {
         case null => "null"
         case other => other.toString
       }

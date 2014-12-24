@@ -11,9 +11,9 @@ object Application extends Controller with CliweShell with JavaScriptEngine with
     Ok(views.html.main("Cliwe!"))
   }
 
-  override def renderResult: PartialFunction[(Any, String), Html] = {
-    case (duck: Duck, duckId) => views.html.duck(duck, duckId)
-    case (aSequence: Seq[_], sequenceId) => views.html.sequence(aSequence, sequenceId)
-    case (aInt: Int, intId) => Html(s"$intId = $aInt: Int")
+  override def renderResult: PartialFunction[ResultWithId, Html] = {
+    case ResultWithId(duck: Duck, duckId) => views.html.duck(duck, duckId)
+    case ResultWithId(aSequence: Seq[_], sequenceId) => views.html.sequence(aSequence, sequenceId)
+    case ResultWithId(aInt: Int, intId) => Html(s"$intId = $aInt: Int")
   }
 }
