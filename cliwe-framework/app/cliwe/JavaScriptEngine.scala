@@ -87,13 +87,16 @@ trait JavaScriptEngine {
   private def containsFunctionCalls(fragment: String) = fragment.contains("(")
 
   private def extractTargetIdAndTrailingFragment(fragment: String): (Option[String], String) = {
-    val lastFragment = fragment.split("\\s+").last
-    if (lastFragment.contains(".")) {
-      lastFragment.split("\\.").toSeq match {
-        case Seq(singleToken) => (Some(singleToken), "")
-        case tokens => (Some(tokens.init.mkString(".")), tokens.last)
-      }
-    } else (None, lastFragment)
+    if (fragment.trim().length > 0) {
+      val lastFragment = fragment.split("\\s+").last
+      if (lastFragment.contains(".")) {
+        lastFragment.split("\\.").toSeq match {
+          case Nil => (None, lastFragment)
+          case Seq(singleToken) => (Some(singleToken), "")
+          case tokens => (Some(tokens.init.mkString(".")), tokens.last)
+        }
+      } else (None, lastFragment)
+    } else (None, "")
   }
 
   private def getOrElseContext(sessionUniqueId: String): ScriptContext = {

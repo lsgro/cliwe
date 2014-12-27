@@ -190,8 +190,8 @@
                 charSpans = getCharSpans(domLine);
             for (var pos = 0; pos < charSpans.length; pos++) { // skip line prompt
                 if (charSpans[pos].childNodes.length > 0) {
-                    var c = charSpans[pos].childNodes[0].nodeValue;
-                    if (c == "&nbsp;") {
+                    var c = charSpans[pos].innerHTML;
+                    if (c === "&nbsp;") {
                         lineText += " ";
                     } else {
                         lineText += c;
@@ -280,6 +280,7 @@
         }
 
         function processCommand(cb) {
+            completions.length = 0;
             $.ajax({
                 type: "POST",
                 url: options.serverUrl,
