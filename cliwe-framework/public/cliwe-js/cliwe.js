@@ -2,14 +2,12 @@
 
     // this plugin can only be used as a singleton currently - global variables shared by any instance of cliwe
     var currentCharIndex = 0,
-        caretElement = $("<span class='caret'>&#x2038;</span>").css({ "position": "absolute", "color": "blue", top: "-3px" }),
+        caretElement = $("<span class='cliwe-caret'>&#x2038;</span>").css({ "position": "absolute", "color": "blue", top: "-3px" }),
         commandBuffer = [],
         linePrompt = "&gt;&nbsp;",
         completions = [],
         completionDialog = null,
         selectedCompletionIndex = -1,
-        keywordSeparatorRegex = /\s*\W\s*/,
-        lastKeywordFragment = "",
         options = {};
 
     $.fn.cliwe = function ( methodOrOptions ) {
@@ -49,7 +47,6 @@
 
         function resetCommandBuffer() {
             commandBuffer = [];
-            lastKeywordFragment = "";
             return this;
         }
 
@@ -89,6 +86,10 @@
         }
 
         // private methods
+
+        function commandBufferIsEmpty() {
+            return commandBuffer.length === 0 || commandBuffer.length === 1 && commandBuffer[0].find(".cliwe-char").length === 0
+        }
 
         function processKey(event) {
             if (event.target.tagName === "BODY") {
@@ -169,9 +170,7 @@
 
         function processCommandBuffer(endOfLine) {
             var text = commandBufferText(),
-                commandFragment = text + (endOfLine ? "\n" : ""),
-                keywords = text.split(keywordSeparatorRegex);
-            lastKeywordFragment = keywords[keywords.length - 1];
+                commandFragment = text + (endOfLine ? "\n" : "");
             processCommand(commandFragment);
         }
 
@@ -311,17 +310,13 @@
 
         // completion dialog
         function showCompletionDialog() {
-            if (lastKeywordFragment.length === 0) {
+            if (commandBufferIsEmpty()) {
                 processCommand("");
             }
-            var currentLine = getLastLine(),
-                charSpans = getCharSpans(currentLine),
-                indexOfLastKeyword = charSpans.length - lastKeywordFragment.length,
-                anchorElement = indexOfLastKeyword >= 0 && indexOfLastKeyword < charSpans.length > 0 ? $(charSpans[indexOfLastKeyword]) : caretElement,
-                keywordStartOffset = anchorElement.offset(),
-                completionLeft = keywordStartOffset.left,
-                dialogTopIfBelow = keywordStartOffset.top + 25, // TODO hardcoded line height
-                dialogBottomIfAbove = $(container).height() - keywordStartOffset.top,
+            var completionOffset = caretElement.offset(),
+                completionLeft = completionOffset.left,
+                dialogTopIfBelow = completionOffset.top + 25, // TODO hardcoded line height
+                dialogBottomIfAbove = $(container).height() - completionOffset.top,
                 dialogHeight = Math.min(completions.length, options.completionLineNumber) * options.completionLineHeight;
             buildCompletionDialog(completions);
             switch (calculateDialogPosition(dialogHeight, dialogTopIfBelow, dialogBottomIfAbove)) {
