@@ -25,7 +25,7 @@ body {
     width: 50%;
 }
 
-.cliwe-suggestions {
+.cliwe-completions {
     color: cornflowerblue;
     background-color: lightgray;
 }
@@ -35,7 +35,7 @@ body {
     background-color: cornflowerblue;
 }
 
-.cliwe-suggestion:hover {
+.cliwe-completion:hover {
     color: white;
     background-color: cadetblue;
 }

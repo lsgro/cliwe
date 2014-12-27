@@ -5,9 +5,9 @@
         caretElement = $("<span class='caret'>&#x2038;</span>").css({ "position": "absolute", "color": "blue", top: "-3px" }),
         commandBuffer = [],
         linePrompt = "&gt;&nbsp;",
-        suggestions = [],
-        suggestionDialog = null,
-        selectedSuggestionIndex = -1,
+        completions = [],
+        completionDialog = null,
+        selectedCompletionIndex = -1,
         keywordSeparatorRegex = /\s*\W\s*/,
         lastKeywordFragment = "",
         options = {};
@@ -66,13 +66,13 @@
         }
 
         function setMenu( html ) {
-            suggestions.length = 0;
+            completions.length = 0;
             $("menuItem", html).each(function() {
                 var item = $(this);
-                suggestions.push({ fragment: item.text(), offset: item.attr("data-insert-offset") });
+                completions.push({ fragment: item.text(), offset: item.attr("data-insert-offset") });
             });
-            if (suggestionDialog !== null) {
-                updateSuggestionDialog();
+            if (completionDialog !== null) {
+                updateCompletionDialog();
             }
         }
 
@@ -93,14 +93,14 @@
         function processKey(event) {
             if (event.target.tagName === "BODY") {
                 var charCode = event.which;
-                if (suggestionDialog !== null && charCode === 13) {
-                    if (selectedSuggestionIndex > -1) {
-                        appendSuggestionToCommandBuffer();
+                if (completionDialog !== null && charCode === 13) {
+                    if (selectedCompletionIndex > -1) {
+                        appendCompletionToCommandBuffer();
                     }
-                    killSuggestionDialog();
+                    killCompletionDialog();
                 } else if (charCode === 0 && event.ctrlKey === true) {
-                    if (suggestionDialog === null) {
-                        showSuggestionDialog();
+                    if (completionDialog === null) {
+                        showCompletionDialog();
                     }
                 } else {
                     processChar(charCode === 13 ? 10 : charCode); // convert '\r' to '\n'
@@ -129,20 +129,20 @@
                         event.preventDefault();
                         break;
                     case 38: // arrow up
-                        if (suggestionDialog !== null) {
-                            suggestionUp();
+                        if (completionDialog !== null) {
+                            completionUp();
                         }
                         event.preventDefault();
                         break;
                     case 40: // arrow down
-                        if (suggestionDialog !== null) {
-                            suggestionDown();
+                        if (completionDialog !== null) {
+                            completionDown();
                         }
                         event.preventDefault();
                         break;
                     case 27: // ESC
-                        if (suggestionDialog !== null) {
-                            killSuggestionDialog();
+                        if (completionDialog !== null) {
+                            killCompletionDialog();
                             event.preventDefault();
                         }
                         break;
@@ -309,8 +309,8 @@
             }
         }
 
-        // suggestion dialog
-        function showSuggestionDialog() {
+        // completion dialog
+        function showCompletionDialog() {
             if (lastKeywordFragment.length === 0) {
                 processCommand("");
             }
@@ -319,25 +319,25 @@
                 indexOfLastKeyword = charSpans.length - lastKeywordFragment.length,
                 anchorElement = indexOfLastKeyword >= 0 && indexOfLastKeyword < charSpans.length > 0 ? $(charSpans[indexOfLastKeyword]) : caretElement,
                 keywordStartOffset = anchorElement.offset(),
-                suggestionLeft = keywordStartOffset.left,
+                completionLeft = keywordStartOffset.left,
                 dialogTopIfBelow = keywordStartOffset.top + 25, // TODO hardcoded line height
                 dialogBottomIfAbove = $(container).height() - keywordStartOffset.top,
-                dialogHeight = Math.min(suggestions.length, options.suggestionLineNumber) * options.suggestionLineHeight;
-            buildSuggestionDialog(suggestions);
+                dialogHeight = Math.min(completions.length, options.completionLineNumber) * options.completionLineHeight;
+            buildCompletionDialog(completions);
             switch (calculateDialogPosition(dialogHeight, dialogTopIfBelow, dialogBottomIfAbove)) {
                 case 'below':
-                    suggestionDialog.css({ left: suggestionLeft, top: dialogTopIfBelow, height: dialogHeight });
+                    completionDialog.css({ left: completionLeft, top: dialogTopIfBelow, height: dialogHeight });
                     break;
                 case 'above':
-                    suggestionDialog.css({ left: suggestionLeft, bottom: dialogBottomIfAbove, height: dialogHeight });
+                    completionDialog.css({ left: completionLeft, bottom: dialogBottomIfAbove, height: dialogHeight });
             }
-            terminalElem.append(suggestionDialog);
+            terminalElem.append(completionDialog);
         }
 
-        function updateSuggestionDialog() {
-            var dialogHeight = Math.min(suggestions.length, options.suggestionLineNumber) * options.suggestionLineHeight;
-            setSuggestionsInDialog(suggestions, suggestionDialog);
-            suggestionDialog.css({ height: dialogHeight });
+        function updateCompletionDialog() {
+            var dialogHeight = Math.min(completions.length, options.completionLineNumber) * options.completionLineHeight;
+            setCompletionsInDialog(completions, completionDialog);
+            completionDialog.css({ height: dialogHeight });
         }
 
         function calculateDialogPosition(dialogHeight, dialogTopIfBelow, dialogBottomIfAbove) {
@@ -348,87 +348,87 @@
             return 'below';
         }
 
-        function buildSuggestionDialog() {
-            selectedSuggestionIndex = -1;
-            suggestionDialog = $("<div class='cliwe-suggestions'></div>");
-            setSuggestionsInDialog(suggestions, suggestionDialog);
+        function buildCompletionDialog() {
+            selectedCompletionIndex = -1;
+            completionDialog = $("<div class='cliwe-completions'></div>");
+            setCompletionsInDialog(completions, completionDialog);
         }
 
-        function setSuggestionsInDialog() {
-            suggestionDialog.empty();
-            for (var i = 0; i < suggestions.length; i++) (function(i) {
-                var suggestionLine = $("<div class='cliwe-suggestion'></div>");
-                suggestionLine.text(suggestions[i].fragment);
-                suggestionLine.css({ height: options.suggestionLineHeight });
-                suggestionLine.click(function() {
-                    setSuggestionSelected(i);
-                    appendSuggestionToCommandBuffer();
-                    killSuggestionDialog();
+        function setCompletionsInDialog() {
+            completionDialog.empty();
+            for (var i = 0; i < completions.length; i++) (function(i) {
+                var completionLine = $("<div class='cliwe-completion'></div>");
+                completionLine.text(completions[i].fragment);
+                completionLine.css({ height: options.completionLineHeight });
+                completionLine.click(function() {
+                    setCompletionSelected(i);
+                    appendCompletionToCommandBuffer();
+                    killCompletionDialog();
                 });
-                suggestionDialog.append(suggestionLine);
+                completionDialog.append(completionLine);
             })(i)
         }
 
-        function appendSuggestionToCommandBuffer() {
-            var selectedSuggestion = suggestions[selectedSuggestionIndex];
-            for (var i = 0; i < selectedSuggestion.offset; i++) {
+        function appendCompletionToCommandBuffer() {
+            var selectedCompletion = completions[selectedCompletionIndex];
+            for (var i = 0; i < selectedCompletion.offset; i++) {
                 removeCurrentChar();
             }
-            appendToCommandBuffer(selectedSuggestion.fragment);
+            appendToCommandBuffer(selectedCompletion.fragment);
         }
 
-        function killSuggestionDialog() {
-            suggestionDialog.remove();
-            suggestionDialog = null;
+        function killCompletionDialog() {
+            completionDialog.remove();
+            completionDialog = null;
         }
 
-        function suggestionUp() {
-            var suggestionNumber = suggestions.length,
+        function completionUp() {
+            var completionNumber = completions.length,
                 index;
-            if (selectedSuggestionIndex === -1) {
-                index = suggestionNumber - 1;
+            if (selectedCompletionIndex === -1) {
+                index = completionNumber - 1;
             } else {
-                index = (selectedSuggestionIndex + suggestionNumber - 1) % suggestionNumber;
+                index = (selectedCompletionIndex + completionNumber - 1) % completionNumber;
             }
-            setSuggestionSelected(index);
+            setCompletionSelected(index);
         }
 
-        function suggestionDown() {
-            var index = (selectedSuggestionIndex + 1) % suggestions.length;
-            setSuggestionSelected(index);
+        function completionDown() {
+            var index = (selectedCompletionIndex + 1) % completions.length;
+            setCompletionSelected(index);
         }
 
-        function setSuggestionSelected(index) {
-            var suggestionElements = suggestionDialog.children("div.cliwe-suggestion"),
-                selectedSuggestionElement = suggestionElements.eq(index);
-            if (selectedSuggestionElement !== undefined) {
-                selectedSuggestionIndex = index;
-                suggestionElements.removeClass("cliwe-selected");
-                selectedSuggestionElement.addClass("cliwe-selected");
+        function setCompletionSelected(index) {
+            var completionElements = completionDialog.children("div.cliwe-completion"),
+                selectedCompletionElement = completionElements.eq(index);
+            if (selectedCompletionElement !== undefined) {
+                selectedCompletionIndex = index;
+                completionElements.removeClass("cliwe-selected");
+                selectedCompletionElement.addClass("cliwe-selected");
             } else {
-                console.error("Trying to set suggestion number: " + index + "/" + suggestionElements.length);
+                console.error("Trying to set completion number: " + index + "/" + completionElements.length);
             }
-            adjustSuggestionDialogScroll();
+            adjustCompletionDialogScroll();
         }
 
-        function adjustSuggestionDialogScroll() {
-            var scrollTop = suggestionDialog.scrollTop(),
-                selectionTop = selectedSuggestionIndex * options.suggestionLineHeight,
-                selectionBottom = selectionTop + options.suggestionLineHeight,
+        function adjustCompletionDialogScroll() {
+            var scrollTop = completionDialog.scrollTop(),
+                selectionTop = selectedCompletionIndex * options.completionLineHeight,
+                selectionBottom = selectionTop + options.completionLineHeight,
                 overflowTop = scrollTop - selectionTop,
-                overflowBottom = selectionBottom - suggestionDialog.height() - scrollTop;
+                overflowBottom = selectionBottom - completionDialog.height() - scrollTop;
             if (overflowTop > 0) {
-                suggestionDialog.scrollTop(selectionTop);
+                completionDialog.scrollTop(selectionTop);
             } else if (overflowBottom > 0) {
-                suggestionDialog.scrollTop(scrollTop + overflowBottom);
+                completionDialog.scrollTop(scrollTop + overflowBottom);
             }
         }
     };
 
     $.fn.cliwe.defaultOptions = {
         serverUrl: "/cliweb",
-        suggestionLineNumber: 10,
-        suggestionLineHeight: 16
+        completionLineNumber: 10,
+        completionLineHeight: 16
     };
 
 })( jQuery );

@@ -71,7 +71,7 @@ img.cliwe-top-right-decoration {
     display: block;
 }
 
-.cliwe-suggestions {
+.cliwe-completions {
     position: absolute;
     z-index: 100;
     font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;

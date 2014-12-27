@@ -2,27 +2,25 @@ package cliwe
 
 import java.io.{PrintWriter, StringWriter}
 import java.util.UUID
-import javax.script.{SimpleScriptContext, ScriptContext}
-import javax.script.ScriptContext._
 
 import play.api.mvc._
+import play.api.Play.current
+import play.api.cache.Cache
 import play.api.mvc.Results.{Ok, BadRequest}
 import play.api.templates.Html
 
+import scala.reflect.ClassTag
 import scala.util.{Failure, Success, Try}
 
 trait CliweShell {
   case class ResultWithId(result: Any, id: String)
 
-  // script framework
-  def executeOrHint(fragment: String, context: ScriptContext, sessionUniqueId: String): ScriptResult
+  def generateScriptResponse(fragment: String, sessionUniqueId: String): ScriptResponse
 
-  // client code
   def renderResult: PartialFunction[ResultWithId, Html]
 
-  // persistence
-  def loadScriptContext(sessionUniqueId: String): Option[ScriptContext]
-  def saveScriptContext(sessionUniqueId: String, context: ScriptContext): Unit
+  // provide Play cache to other traits
+  def getOrElseObject[T](id: String)(generator: =>T)(implicit ct: ClassTag[T]): T = Cache.getOrElse(id)(generator)
 
   // action
   def shell = Action {
@@ -35,29 +33,20 @@ trait CliweShell {
       responseData.getOrElse(BadRequest("commandBuffer argument not set")).withSession("uniqueId" -> sessionUniqueId)
   }
 
-  private def applyScriptFragment(fragment: String, sessionUniqueId: String): Html = {
-    val context = getOrElseContext(sessionUniqueId)
-    val outputWriter = new StringWriter()
-    val errorWriter = new StringWriter()
-    context.setWriter(outputWriter)
-    context.setErrorWriter(errorWriter)
-    val html = Try(executeOrHint(fragment, context, sessionUniqueId)) match {
-      case Success(ScriptValue(result, resultId)) =>
-        registerInContext(result, resultId, context)
-        val output = outputWriter.toString
-        val error = errorWriter.toString
+  def applyScriptFragment(fragment: String, sessionUniqueId: String): Html = {
+    val html = Try(generateScriptResponse(fragment, sessionUniqueId)) match {
+      case Success(ScriptResult(result, resultId, stderr, stdout)) =>
         val renderedResult = renderResultWithDefault(ResultWithId(result, resultId))
-        cliwe.views.html.response(cliwe.views.html.outandresult(error, output, renderedResult))
-      case Success(ScriptCompletions(suggestions)) =>
-        cliwe.views.html.menu(suggestions)
+        cliwe.views.html.response(cliwe.views.html.outandresult(stderr, stdout, renderedResult))
+      case Success(ScriptCompletions(completions)) =>
+        cliwe.views.html.menu(completions)
       case Failure(exception) =>
         cliwe.views.html.response(cliwe.views.html.stacktrace(extractStackTrace(exception)))
     }
-    saveScriptContext(sessionUniqueId, context)
     html
   }
 
-  private def renderResultWithDefault(resultWithId: ResultWithId) =
+  def renderResultWithDefault(resultWithId: ResultWithId) =
     if (renderResult.isDefinedAt(resultWithId)) renderResult(resultWithId)
     else Html(
       resultWithId.result match {
@@ -66,20 +55,12 @@ trait CliweShell {
       }
     )
 
-  private def getOrElseUniqueId(request: Request[_]): String = request.session.get("uniqueId").getOrElse(UUID.randomUUID().toString)
+  def getOrElseUniqueId(request: Request[_]): String = request.session.get("uniqueId").getOrElse(UUID.randomUUID().toString)
 
-  private def extractStackTrace(exception: Throwable) = {
+  def extractStackTrace(exception: Throwable) = {
     val stackTraceBuffer = new StringWriter()
     val stackTraceWriter = new PrintWriter(stackTraceBuffer)
     exception.printStackTrace(stackTraceWriter)
     stackTraceBuffer.toString
-  }
-
-  private def registerInContext(obj: Any, id: String, context: ScriptContext) {
-    context.setAttribute(id, obj, ENGINE_SCOPE)
-  }
-
-  private def getOrElseContext(sessionUniqueId: String): ScriptContext = {
-    loadScriptContext(sessionUniqueId).getOrElse(new SimpleScriptContext)
   }
 }
