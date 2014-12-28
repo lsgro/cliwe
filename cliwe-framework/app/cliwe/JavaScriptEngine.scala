@@ -90,9 +90,7 @@ trait JavaScriptEngine {
     if (fragment.trim().length > 0) {
       val lastFragment = fragment.split("\\s+").last
       if (lastFragment.contains(".")) {
-        lastFragment.split("\\.").toSeq match {
-          case Nil => (None, lastFragment)
-          case Seq(singleToken) => (Some(singleToken), "")
+        lastFragment.split("\\.", -1).toSeq match {
           case tokens => (Some(tokens.init.mkString(".")), tokens.last)
         }
       } else (None, lastFragment)
