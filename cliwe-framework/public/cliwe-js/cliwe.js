@@ -427,7 +427,7 @@
     $.fn.cliwe.defaultOptions = {
         serverUrl: "/cliweb",
         completionLineNumber: 10,
-        completionLineHeight: 16
+        completionLineHeight: 17
     };
 
 })( jQuery );

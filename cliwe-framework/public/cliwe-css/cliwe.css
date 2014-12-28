@@ -76,5 +76,6 @@ img.cliwe-top-right-decoration {
     z-index: 100;
     font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
     font-size: 14px;
-    overflow: scroll;
+    overflow-y: auto;
+    overflow-x: hidden;
 }
