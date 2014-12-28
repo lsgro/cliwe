@@ -92,17 +92,13 @@
         }
 
         function processKey(event) {
-            if (event.target.tagName === "BODY") {
+            if (event.target.tagName === "BODY" && !event.ctrlKey) {
                 var charCode = event.which;
                 if (completionDialog !== null && charCode === 13) {
                     if (selectedCompletionIndex > -1) {
                         appendCompletionToCommandBuffer();
                     }
                     killCompletionDialog();
-                } else if (charCode === 0 && event.ctrlKey === true) {
-                    if (completionDialog === null) {
-                        showCompletionDialog();
-                    }
                 } else {
                     processChar(charCode === 13 ? 10 : charCode); // convert '\r' to '\n'
                 }
@@ -113,6 +109,13 @@
         function processSpecialKey(event) {
             if (event.target.tagName === "BODY") {
                 switch (event.keyCode) {
+                    case 32: // space + ctrl
+                        if (event.ctrlKey) {
+                            if (completionDialog === null) {
+                                showCompletionDialog();
+                            }
+                        }
+                        break;
                     case 8: // backspace
                         removeCurrentChar();
                         event.preventDefault();
@@ -428,3 +431,4 @@
     };
 
 })( jQuery );
+
