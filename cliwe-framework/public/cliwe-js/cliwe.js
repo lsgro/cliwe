@@ -100,7 +100,7 @@
                     }
                     killCompletionDialog();
                 } else {
-                    processChar(charCode === 13 ? 10 : charCode); // convert '\r' to '\n'
+                    processChar(charCode);
                 }
                 event.preventDefault();
             }
@@ -109,10 +109,17 @@
         function processSpecialKey(event) {
             if (event.target.tagName === "BODY") {
                 switch (event.keyCode) {
-                    case 32: // space + ctrl
+                    case 13: // ctrl + enter
+                        if (event.ctrlKey) {
+                            processChar(12); // send a '\f'
+                            event.preventDefault();
+                        }
+                        break;
+                    case 32: // ctrl + space
                         if (event.ctrlKey) {
                             if (completionDialog === null) {
                                 showCompletionDialog();
+                                event.preventDefault();
                             }
                         }
                         break;
@@ -155,8 +162,9 @@
         }
 
         function processChar(charCode) {
-            if (charCode === 10) {
-                processCommandBuffer(true); // external callback will dump command output and result, and change prompt
+            if (charCode >= 10 && charCode <= 13) {
+                var endOfCommand = charCode === 12 || !options.multiLine; // if multiLine execute only on \f
+                processCommandBuffer(endOfCommand);
                 var line = newLine();
                 putPrompt(line);
             } else {
@@ -171,9 +179,9 @@
             }
         }
 
-        function processCommandBuffer(endOfLine) {
+        function processCommandBuffer(endOfCommand) {
             var text = commandBufferText(),
-                commandFragment = text + (endOfLine ? "\n" : "");
+                commandFragment = text + (endOfCommand ? "\f" : "");
             processCommand(commandFragment);
         }
 
@@ -427,7 +435,8 @@
     $.fn.cliwe.defaultOptions = {
         serverUrl: "/cliweb",
         completionLineNumber: 10,
-        completionLineHeight: 17
+        completionLineHeight: 17,
+        multiLine: true
     };
 
 })( jQuery );

@@ -30,7 +30,7 @@ trait JavaScriptEngine {
 
   def generateScriptResponse(fragment: String, sessionUniqueId: String): ScriptResponse = {
     val context = getOrElseContext(sessionUniqueId)
-    if (fragment.endsWith("\n")) {
+    if (fragment.endsWith("\f")) {
       val outputWriter = new StringWriter()
       val errorWriter = new StringWriter()
       context.setWriter(outputWriter)
