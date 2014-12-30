@@ -82,7 +82,7 @@
             if (methodArguments.length > 0) {
                 argumentsFragment += methodArguments[methodArguments.length - 1];
             }
-            appendToCommandBuffer(id + "." + method + "(" + argumentsFragment + ")\n");
+            appendToCommandBuffer(id + "." + method + "(" + argumentsFragment + ")\f");
         }
 
         // private methods
