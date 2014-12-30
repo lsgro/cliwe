@@ -2,7 +2,7 @@ name := "cliwe"
 
 organization := "com.github.lsgro"
 
-version := "1.0"
+version := "1.1-SNAPSHOT"
 
 libraryDependencies ++= Seq(
   cache
