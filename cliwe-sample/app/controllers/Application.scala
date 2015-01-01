@@ -1,6 +1,8 @@
 package controllers
 
-import model.Duck
+import javax.script.ScriptContext
+
+import model.{CalcHolder, Duck}
 import play.api.mvc._
 import play.api.templates.Html
 import cliwe.{CompletionFragment, DevCacheOnlyPersistence, JavaScriptEngine, CliweShell}
