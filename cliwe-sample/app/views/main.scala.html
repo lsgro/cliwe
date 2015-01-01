@@ -10,9 +10,23 @@
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("cliwe-css/cliwe.css")">
     <body>
+        <div class="outer-container">
+            <header>
+                <h1>Cliwe sample page</h1>
+                <p>Cliwe is the command-line interface framework for web applications</p>
+                <p>Super-powers for smarter users</p>
+            </header>
+        </div>
         <div class="command-line-frame">
-            <div class="cliwe-larder"></div>
-            <div class="cliwe-terminal"></div>
+            <div class="cliwe-terminal-container">
+                <h2>javascript</h2>
+                <div class="cliwe-terminal"></div>
+                <div class="cliwe-terminal-control"><label for="multi-line-enabled">Multi-line:</label><input id="multi-line-enabled" type="checkbox"></div>
+            </div>
+            <div class="cliwe-larder-container">
+                <h2>pin board</h2>
+                <div class="cliwe-larder"></div>
+            </div>
         </div>
     </body>
 </html>
