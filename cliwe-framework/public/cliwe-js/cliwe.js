@@ -13,7 +13,6 @@
     $.fn.cliwe = function ( methodOrOptions ) {
 
         var terminalElem = this,
-            container = this.parent(),
             methods = {
                 setLinePrompt: setLinePrompt,
                 resetCommandBuffer: resetCommandBuffer,
@@ -281,7 +280,7 @@
                 caretLeft = 15;
             }
             caretElement.css({left: caretLeft});
-            terminalElem.scrollTop($(container).height());
+            terminalElem.scrollTop(terminalElem.prop("scrollHeight") - terminalElem.height());
         }
 
         function setBlink(element, period) {
@@ -325,10 +324,11 @@
             if (commandBufferIsEmpty()) {
                 processCommand("");
             }
-            var completionOffset = caretElement.offset(),
-                completionLeft = completionOffset.left,
-                dialogTopIfBelow = completionOffset.top + 25, // TODO hardcoded line height
-                dialogBottomIfAbove = $(container).height() - completionOffset.top,
+            var caretOffset = caretElement.offset(),
+                terminalOffset = terminalElem.offset(),
+                completionLeft = caretOffset.left - terminalOffset.left,
+                dialogTopIfBelow = caretOffset.top - terminalOffset.top + 25, // TODO hardcoded line height
+                dialogBottomIfAbove = terminalElem.height() - terminalElem.scrollTop() - caretOffset.top + terminalOffset.top,
                 dialogHeight = Math.min(completions.length, options.completionLineNumber) * options.completionLineHeight;
             buildCompletionDialog(completions);
             switch (calculateDialogPosition(dialogHeight, dialogTopIfBelow, dialogBottomIfAbove)) {
@@ -348,9 +348,9 @@
         }
 
         function calculateDialogPosition(dialogHeight, dialogTopIfBelow, dialogBottomIfAbove) {
-            var documentHeight = $(container).height(),
-                marginIfBelow = documentHeight - dialogTopIfBelow - dialogHeight,
-                marginIfAbove = documentHeight - dialogBottomIfAbove - dialogHeight;
+            var terminalHeight = terminalElem.height(),
+                marginIfBelow = terminalHeight - dialogTopIfBelow - dialogHeight,
+                marginIfAbove = terminalHeight - dialogBottomIfAbove - dialogHeight;
             if (marginIfBelow < 0 && marginIfAbove > marginIfBelow) return 'above';
             return 'below';
         }
