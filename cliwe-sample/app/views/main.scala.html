@@ -21,7 +21,15 @@
             <div class="cliwe-terminal-container">
                 <h2>javascript</h2>
                 <div class="cliwe-terminal"></div>
-                <div class="cliwe-terminal-control"><label for="multi-line-enabled">Multi-line:</label><input id="multi-line-enabled" type="checkbox"></div>
+                <div class="cliwe-terminal-control">
+                    <button class="control-button" onclick="$('.cliwe-terminal').cliwe('clearTerminal'); $(this).blur()">Clear</button>
+                    <span class="multi-line-tip">Use CTRL+ENTER to submit</span>
+                    <span>
+                         <label for="multi-line-enabled">Multi-line:</label>
+                         <input id="multi-line-enabled" type="checkbox"
+                             onclick="$('.cliwe-terminal').cliwe('setMultiLine', this.checked); $(this).blur(); if (this.checked) { $('.multi-line-tip').show() } else { $('.multi-line-tip').hide() }">
+                    </span>
+                </div>
             </div>
             <div class="cliwe-larder-container">
                 <h2>pin board</h2>

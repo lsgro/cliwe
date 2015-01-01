@@ -19,7 +19,9 @@
                 appendToCommandBuffer: appendToCommandBuffer,
                 dump: dump,
                 setMenu: setMenu,
-                callObjectMethod: callObjectMethod
+                callObjectMethod: callObjectMethod,
+                setMultiLine: setMultiLine,
+                clearTerminal: clearTerminal
             };
 
         if ( methods[ methodOrOptions ]) {
@@ -82,6 +84,16 @@
                 argumentsFragment += methodArguments[methodArguments.length - 1];
             }
             appendToCommandBuffer(id + "." + method + "(" + argumentsFragment + ")\f");
+        }
+
+        function setMultiLine(multiLineEnabled) {
+            options.multiLine = multiLineEnabled;
+        }
+
+        function clearTerminal() {
+            terminalElem.empty();
+            resetCommandBuffer();
+            putPrompt(newLine());
         }
 
         // private methods
@@ -436,7 +448,7 @@
         serverUrl: "/cliweb",
         completionLineNumber: 10,
         completionLineHeight: 17,
-        multiLine: true
+        multiLine: false
     };
 
 })( jQuery );

@@ -1,6 +1,5 @@
 html, body {
-    margin: 0;
-    margin: 20px;
+    margin: 10px 20px 0;
     background-color: lightgray;
 }
 
@@ -45,7 +44,7 @@ h2 {
 }
 
 .cliwe-terminal {
-    height: 300px;
+    height: 400px;
     border: solid 1px black;
     overflow: auto;
     position: relative;
@@ -56,10 +55,25 @@ h2 {
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
     text-align: right;
+    margin: 5px 0 5px;
+}
+
+.multi-line-tip {
+    display: none;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    color: grey;
+    margin: 0 10px 0 10px;
+}
+
+.control-button {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    margin: 0 10px 0 10px;
 }
 
 .cliwe-larder {
-    min-height: 300px;
+    min-height: 400px;
     border: solid 1px black;
     overflow: auto;
     background-color: white;
