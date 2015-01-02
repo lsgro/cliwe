@@ -8,7 +8,7 @@ libraryDependencies ++= Seq(
   jdbc,
   anorm,
   cache,
-  "com.github.lsgro" % "cliwe_2.10" % "1.1-SNAPSHOT"
+  "com.github.lsgro" % "cliwe_2.10" % "1.1"
 )     
 
 play.Project.playScalaSettings
