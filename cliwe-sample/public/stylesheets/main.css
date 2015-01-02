@@ -10,7 +10,7 @@ body {
 header {
     margin: 0;
     padding-top: 15px;
-    padding-bottom: 25px;
+    padding-bottom: 20px;
 }
 
 h2 {
@@ -92,4 +92,20 @@ h2 {
 .cliwe-completion:hover {
     color: white;
     background-color: cadetblue;
+}
+
+.cliwe {
+    font-family: "Courier New", Courier, monospace;
+}
+
+.black {
+    color: black;
+}
+
+.orange {
+    color: orange;
+}
+
+.green {
+    color: green;
 }
