@@ -59,15 +59,15 @@ img.cliwe-top-right-decoration {
     display: block;
 }
 
-.cliwe-terminal img.cliwe-show-in-larder {
+.cliwe-terminal img.cliwe-show-in-pin-board {
     display: none;
 }
 
-.cliwe-larder img.cliwe-show-in-terminal {
+.cliwe-pin-board img.cliwe-show-in-terminal {
     display: none;
 }
 
-.cliwe-larder img.cliwe-show-in-larder {
+.cliwe-pin-board img.cliwe-show-in-pin-board {
     display: block;
 }
 
