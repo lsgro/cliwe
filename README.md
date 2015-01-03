@@ -12,11 +12,35 @@ Features:
 - HTML console allows for customized graphic output
 - Customizable code completion dialog
 - All interaction happens by issuing commands in the terminals
-- Auditable
+
+## Run the sample application
+
+Clone the source repository:
+
+    git clone https://github.com/lsgro/cliwe.git
+    
+enter the sample application root directory
+
+    cd cliwe/cliwe-sample/
+    
+in `build.sbt` change the dependency on cliwe to the latest release available on public repository:
+
+    ....
+    libraryDependencies += "com.github.lsgro" % "cliwe_2.10" % "1.1"
+    ....
+    
+(alternatively compile the library and publish to your local repository)    
+    
+run sbt and then start the application:
+
+    sbt
+    [cliwe-sample] $ run
+    
+point the browser to `http://localhost:9000`
 
 ## Usage
 
-Cliwe is currently available in compiled form only for Scala 2.10. Compile from the source if you need to use it with another version.
+Cliwe is currently available in compiled form only for Scala 2.10. Compile from the source if you need to use it with another Scala version.
 
 ### Adding the dependency
 In your `build.sbt` add the following lines:
