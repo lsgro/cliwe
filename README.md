@@ -40,7 +40,7 @@ point the browser to `http://localhost:9000`
 
 ## Usage
 
-Cliwe is currently available in compiled form only for Scala 2.10. Compile from the source if you need to use it with another Scala version.
+cliwe is currently available in compiled form only for Scala 2.10. Compile from the source if you need to use it with another Scala version.
 
 ### Adding the dependency
 In your `build.sbt` add the following lines:
@@ -49,7 +49,7 @@ In your `build.sbt` add the following lines:
 to add the Sonatype repository.
     
     libraryDependencies += "com.github.lsgro" % "cliwe_2.10" % "1.1"
-to depend on Cliwe.
+to depend on cliwe.
   
 ### Adding a console to an HTML page in the client application
 Add the following DIVs:
@@ -60,17 +60,17 @@ and
 
     <div class="cliwe-pin-board"></div>
 
-and initialise the Cliwe terminal by instantiating the JQuery component:
+and initialise the cliwe terminal by instantiating the JQuery component:
 
     <script type="text/javascript">$(function(){$(".cliwe-terminal").cliwe()})</script>
 
-### Mixing-in Cliwe in your web application
+### Mixing-in cliwe in your web application
 Mix the trait `CliweShell` in your Play 2 Controller.
 Depending on the level of functionality to integrate, choose one of the following options:
 
 #### Javascript shell
 The JDK 1.7+ comes with an embedded JavaScript interpreter, available through the Java Scripting API `javax.script`.
-The trait `JavaScriptEngine` provides an adapter to use it with Cliwe.
+The trait `JavaScriptEngine` provides an adapter to use it with cliwe.
 Mix the traits `CliweShell` and `JavaScriptEngine` in your Play 2 Controller:
 
     object Application extends Controller with CliweShell with JavaScriptEngine { ... }
