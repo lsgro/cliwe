@@ -51,7 +51,7 @@ trait CliweShell {
     else Html(
       resultWithId.result match {
         case null => "null"
-        case other => other.toString
+        case other => s"${resultWithId.id} = $other"
       }
     )
 

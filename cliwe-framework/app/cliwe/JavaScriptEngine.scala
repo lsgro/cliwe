@@ -39,9 +39,9 @@ trait JavaScriptEngine {
       val stderr = errorWriter.toString
       val stdout = outputWriter.toString
       val trimmedFragment = fragment.trim
-      val resultId = if (isBareIdentifier(trimmedFragment)) {
-        trimmedFragment // using a bare identifier: assume that it is already present in script context
-      } else {
+      val resultId = if (isBareIdentifier(trimmedFragment)) trimmedFragment // using a bare identifier: assume it is already present in script context
+      else if (result == null) "null"
+      else {
         val resultId = nextResultId(sessionUniqueId, context)
         context.setAttribute(resultId, result, ENGINE_SCOPE)
         resultId
