@@ -22,7 +22,7 @@ object CliweSample extends Controller with CliweShell with JavaScriptEngine with
               engine.tick
               Ok("""{"bid": %f, "ask": %f, "money": %f, "asset": %d}""".format(engine.lastQuote.bid, engine.lastQuote.ask, engine.position.money, engine.position.asset))
           }
-      }.getOrElse(Ok("CIAO")).withSession("uniqueId" -> sessionUniqueId)
+      }.getOrElse(Ok("{}")).withSession("uniqueId" -> sessionUniqueId)
   }
 
   override def renderResult: PartialFunction[ResultWithId, Html] = {
@@ -32,13 +32,25 @@ object CliweSample extends Controller with CliweShell with JavaScriptEngine with
     case ResultWithId(aInt: Int, id) => Html(s"$id = $aInt: Int")
   }
 
-  override def scriptContextInitializers: Seq[(String, Any)] = Nil
+  override def scriptContextInitializers: Seq[(String, Any)] = Seq(("te", new TradingEngine))
 
-  override def generateTopLevelCompletions(fragment: String): Seq[CompletionFragment] = Nil
+  val topLevelObjectIds = Seq("te")
+
+  override def generateTopLevelCompletions(fragment: String): Seq[CompletionFragment] = topLevelObjectIds.filter(_.startsWith(fragment)).map {
+    topLevelObject =>
+      CompletionFragment(topLevelObject, fragment.length)
+  }
+
+  val tradingEngineMethods = Seq("position()", "lastQuote()", "buy(", "sell(", "tick()")
 
   override def generateCompletions(value: Any, trailingFragment: String): Seq[CompletionFragment] = value match {
     case d: Duck if "quack()".startsWith(trailingFragment) =>
       Seq(CompletionFragment("quack()", trailingFragment.length))
+    case te: TradingEngine if tradingEngineMethods.exists(_.startsWith(trailingFragment)) =>
+      tradingEngineMethods.filter(_.startsWith(trailingFragment)).map {
+        method =>
+          CompletionFragment(method, trailingFragment.length)
+      }
     case _ => Nil
   }
 

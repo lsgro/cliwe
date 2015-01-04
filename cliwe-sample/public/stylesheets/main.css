@@ -109,3 +109,36 @@ h2 {
 .green {
     color: green;
 }
+
+.trade-price, .trade-button {
+    text-align: right;
+}
+
+.trading-engine {
+    font-family: 'DejaVu Sans', Arial, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+.trade-price {
+    font-weight: bold;
+}
+
+.up-tick {
+    color: darkgreen;
+}
+
+.down-tick {
+    color: red;
+}
+
+input {
+    text-align: right;
+}
+
+.quantity {
+    width: 100%;
+}
+
+.header {
+    font-weight: bolder;
+}

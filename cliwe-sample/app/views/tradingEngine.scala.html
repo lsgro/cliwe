@@ -1,31 +1,82 @@
 @(me: model.trading.TradingEngine, objectId: String)
 
-<div class="trading-engine">
-    <div class="quote">
-        <span class="bid" onclick="$('.cliwe-terminal').cliwe('callObjectMethod', '@objectId', 'sell', $('#trade-qty').val()); this.blur()">PIPPO</span>
-        <span class="ask" onclick="$('.cliwe-terminal').cliwe('callObjectMethod', '@objectId', 'buy', $('#trade-qty').val()); this.blur()">CICCIO</span>
-    </div>
-    <div class="quantity">
-       <input id="trade-qty" type="number" value="100">
-    </div>
-    <div class="position">
-       <label for="money">Money</label><input type="number" readonly="true" id="money">
-       <label for="asset">Asset</label><input type="number" readonly="true" id="asset">
-    </div>
+<div id="trading-engine-@objectId" class="trading-engine">
+    <table>
+        <tr>
+            <td colspan="2"><span class="header">Trading Engine: @objectId</span> [click on the prices to trade]</td>
+        </tr>
+        <tr>
+            <td id="bid-side-@objectId" onclick="$ ( '.cliwe-terminal' ).cliwe ( 'callObjectMethod', '@objectId', 'sell', $('#trade-qty-@objectId').val() ); this.blur()">
+                <div class="trade-button">Sell</div>
+                <div id="bid-@objectId" class="trade-price">0</div>
+            </td>
+            <td id="ask-side-@objectId" onclick="$ ( '.cliwe-terminal' ).cliwe ( 'callObjectMethod', '@objectId', 'buy', $('#trade-qty-@objectId').val() ); this.blur()">
+                <div class="trade-button">Buy</div>
+                <div id="ask-@objectId" class="trade-price">0</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <div class="quantity">
+                    <label for="trade-qty-@objectId">Quantity</label>
+                    <input id="trade-qty-@objectId" type="number" value="100">
+                </div>
+            </td>
+        </tr>
+        <tr><td class="header" colspan="2">Position</td></tr>
+        <tr>
+            <td>
+                <label for="money-@objectId">Money</label><input type="number" readonly="true" id="money-@objectId">
+            </td>
+            <td>
+                <label for="asset-@objectId">Asset</label><input type="number" readonly="true" id="asset-@objectId">
+            </td>
+        </tr>
+    </table>
 </div>
 <script type="application/javascript">
-   setInterval(function() {
-        $.get('@routes.CliweSample.quote(objectId)',
-        function(data) {
-            var tradingEngineState = JSON.parse(data);
-            var bidPrice = tradingEngineState.bid;
-            var askPrice = tradingEngineState.ask;
-            var moneyPosition = tradingEngineState.money;
-            var assetPosition = tradingEngineState.asset;
-            $(".bid").text(bidPrice);
-            $(".ask").text(askPrice);
-            $("#money").val(moneyPosition);
-            $("#asset").val(assetPosition);
-        });
-   }, 1000);
+//  <!--
+var oldBidPrice, oldAskPrice;
+
+function formatConditionally(oldPrice, newPrice, element) {
+    if (newPrice > oldPrice) {
+        element.removeClass("down-tick");
+        element.addClass("up-tick");
+    } else if (newPrice < oldPrice) {
+        element.removeClass("up-tick");
+        element.addClass("down-tick");
+    } else {
+        element.removeClass("down-tick");
+        element.removeClass("up-tick");
+    }
+}
+
+var refreshHandle = setInterval(
+    function(){
+        var rootElement = $("#trading-engine-" + "@objectId");
+        if (rootElement.length === 0) { // UI element removed
+            clearInterval(refreshHandle);
+        } else {
+            $.get(
+                '@routes.CliweSample.quote(objectId)',
+                function(data) {
+                    var tradingEngineState = JSON.parse(data);
+                    var bidPrice = tradingEngineState.bid;
+                    var askPrice = tradingEngineState.ask;
+                    var moneyPosition = tradingEngineState.money;
+                    var assetPosition = tradingEngineState.asset;
+                    formatConditionally(oldBidPrice, bidPrice, $("#bid-side-" + "@objectId"));
+                    oldBidPrice = bidPrice;
+                    formatConditionally(oldAskPrice, askPrice, $("#ask-side-" + "@objectId"));
+                    oldAskPrice = askPrice;
+                    $("#bid-" + "@objectId").text(bidPrice);
+                    $("#ask-" + "@objectId").text(askPrice);
+                    $("#money-" + "@objectId").val(moneyPosition);
+                    $("#asset-" + "@objectId").val(assetPosition);
+                }
+            );
+        }
+    },
+    1000);
+// -->
 </script>
