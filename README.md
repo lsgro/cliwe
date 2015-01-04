@@ -141,3 +141,10 @@ used to return a command result, when the fragment entered is ended by a `'\f'` 
 to return script completions, when the fragment entered is incomplete.
 
 The second method, `renderResult`, has been discussed above.
+
+### Implementing the assetAt method in the client controller
+Implement the abstract method:
+
+    override def assetsAt: String => Call = routes.Assets.at _
+
+In fact the cliwe module doesn't specify a Router class, leaving this to the client application. This seems to be necessary to avoid having two `routes` reverse routing classes in the classpath.
