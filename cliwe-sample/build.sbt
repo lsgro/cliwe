@@ -1,6 +1,6 @@
 name := "cliwe-sample"
 
-version := "1.0-SNAPSHOT"
+version := "1.0"
 
 libraryDependencies ++= Seq(
   jdbc,
@@ -12,4 +12,4 @@ play.Project.playScalaSettings
 
 resolvers += Resolver.sonatypeRepo("public")
 
-libraryDependencies += "com.github.lsgro" % "cliwe_2.10" % "1.1.1-SNAPSHOT"
+libraryDependencies += "com.github.lsgro" % "cliwe_2.10" % "1.1.1"
