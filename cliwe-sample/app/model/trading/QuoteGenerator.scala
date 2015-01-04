@@ -2,14 +2,13 @@ package model.trading
 
 import scala.util.Random
 
-class QuoteGenerator(seed: Int, priceAverage: Double, priceVolatility: Double, spreadAverage: Double, spreadVolatility: Double) {
+class QuoteGenerator(seed: Int, stepAverage: Double, stepVolatility: Double, spreadAverage: Double, spreadVolatility: Double) {
   val random = new Random(seed)
-  def nextMidPrice = random.nextGaussian() * priceVolatility + priceAverage
+  def nextPriceStep = random.nextGaussian() * stepVolatility + stepAverage
   def nextSpread = random.nextGaussian() * spreadVolatility + spreadAverage
-  def nextQuote = {
-    val midPrice = nextMidPrice
-    val halfSpread = nextSpread / 2.0
-    Quote(midPrice - halfSpread, midPrice + halfSpread)
+  def nextQuote(previousQuote: Quote) = {
+    val bidPrice = previousQuote.bid * (1 + nextPriceStep)
+    Quote(bidPrice, bidPrice + nextSpread)
   }
 }
 

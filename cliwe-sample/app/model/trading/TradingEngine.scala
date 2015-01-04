@@ -2,11 +2,11 @@ package model.trading
 
 class TradingEngine {
   var position = Position(0, 0)
-  val quoteGenerator = new QuoteGenerator(1, 100, 1, 1, 0.05)
-  var lastQuote: Quote = tick
+  val quoteGenerator = new QuoteGenerator(1, 0, 0.01, 1, 0.05)
+  var lastQuote: Quote = Quote(100, 101)
 
   def tick: Quote = {
-    lastQuote = quoteGenerator.nextQuote
+    lastQuote = quoteGenerator.nextQuote(lastQuote)
     lastQuote
   }
   def trade(quantity: Int): Position = {
