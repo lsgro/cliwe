@@ -26,7 +26,7 @@ enter the sample application root directory
 in `build.sbt` change the dependency on cliwe to the latest release available on public repository:
 
     ....
-    libraryDependencies += "com.github.lsgro" % "cliwe_2.10" % "1.1"
+    libraryDependencies += "com.github.lsgro" % "cliwe_2.10" % "1.1.1"
     ....
     
 (alternatively compile the library and publish to your local repository)    
