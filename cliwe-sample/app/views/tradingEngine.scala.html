@@ -1,0 +1,31 @@
+@(me: model.trading.TradingEngine, objectId: String)
+
+<div class="trading-engine">
+    <div class="quote">
+        <span class="bid" onclick="$('.cliwe-terminal').cliwe('callObjectMethod', '@objectId', 'sell', $('#trade-qty').val()); this.blur()">PIPPO</span>
+        <span class="ask" onclick="$('.cliwe-terminal').cliwe('callObjectMethod', '@objectId', 'buy', $('#trade-qty').val()); this.blur()">CICCIO</span>
+    </div>
+    <div class="quantity">
+       <input id="trade-qty" type="number" value="100">
+    </div>
+    <div class="position">
+       <label for="money">Money</label><input type="number" readonly="true" id="money">
+       <label for="asset">Asset</label><input type="number" readonly="true" id="asset">
+    </div>
+</div>
+<script type="application/javascript">
+   setInterval(function() {
+        $.get('@routes.CliweSample.quote(objectId)',
+        function(data) {
+            var tradingEngineState = JSON.parse(data);
+            var bidPrice = tradingEngineState.bid;
+            var askPrice = tradingEngineState.ask;
+            var moneyPosition = tradingEngineState.money;
+            var assetPosition = tradingEngineState.asset;
+            $(".bid").text(bidPrice);
+            $(".ask").text(askPrice);
+            $("#money").val(moneyPosition);
+            $("#asset").val(assetPosition);
+        });
+   }, 1000);
+</script>

@@ -22,6 +22,11 @@ trait CliweShell {
   // provide Play cache to other traits
   def getOrElseObject[T](id: String)(generator: =>T)(implicit ct: ClassTag[T]): T = Cache.getOrElse(id)(generator)
 
+  // to be implemented by routes routes.Assets.at in the client controller declaring:
+  // GET         /assets/*file        controllers.Assets.at(path="/public", file)
+  // in the routing configuration file
+  implicit def assetsAt: String => Call // define as = routes.Assets.at _ in the client Controller
+
   // action
   def shell = Action {
     request =>

@@ -1,13 +1,13 @@
-@(lines: String)
+@(lines: String)(implicit assetsAt: String => Call)
 
 @detachable {
 <div class="cliwe-stack-trace cliwe-error cliwe-section">
     @lines.split("\\n").toList match {
         case firstLine::otherLines => {
             <div class="cliwe-stack-trace cliwe-error cliwe-line">
-                <img class="cliwe-collapsed" vertical-align="text-bottom" src="@routes.Assets.at("cliwe-icons/error_expand.png")"
+                <img class="cliwe-collapsed" vertical-align="text-bottom" src="@assetsAt("cliwe-icons/error_expand.png")"
                      onclick="var cont = $(this).parent().parent(); $('.cliwe-expanded', cont).show(); $('.cliwe-collapsed', cont).hide()">
-                <img style="display:none" class="cliwe-expanded" vertical-align="text-bottom" src="@routes.Assets.at("cliwe-icons/error_collapse.png")"
+                <img style="display:none" class="cliwe-expanded" vertical-align="text-bottom" src="@assetsAt("cliwe-icons/error_collapse.png")"
                      onclick="var cont = $(this).parent().parent(); $('.cliwe-collapsed', cont).show(); $('.cliwe-expanded', cont).hide()"
                 <span>@firstLine</span>
                 <span class="cliwe-collapsed">...</span>

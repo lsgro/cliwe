@@ -1,4 +1,4 @@
-@(stderr: String, stdout: String, result: Html)
+@(stderr: String, stdout: String, result: Html)(implicit assetsAt: String => Call)
 
 @if(stderr.nonEmpty) {
     @detachable(section(stderr, "cliwe-error"))

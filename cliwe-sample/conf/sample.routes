@@ -3,10 +3,11 @@
 # ~~~~
 
 # Home page
-GET         /                    controllers.Application.index
+GET         /                    controllers.CliweSample.index
+GET         /quote               controllers.CliweSample.quote(engineId: String)
 
 # cliweb command execution
-POST        /cliweb              controllers.Application.shell
+POST        /cliweb              controllers.CliweSample.shell
 
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file        controllers.Assets.at(path="/public", file)

@@ -1,9 +1,9 @@
-@(content: Html)
+@(content: Html)(implicit assetsAt: String => Call)
 
 <div class="cliwe-detachable">
-    <img class="cliwe-top-right-decoration cliwe-show-in-terminal" src="@routes.Assets.at("cliwe-icons/pin.png")"
+    <img class="cliwe-top-right-decoration cliwe-show-in-terminal" src="@assetsAt("cliwe-icons/pin.png")"
          onclick="var div = $(this).parent(); div.detach();$('.cliwe-pin-board').append(div)">
-    <img class="cliwe-top-right-decoration cliwe-show-in-pin-board" src="@routes.Assets.at("cliwe-icons/delete.png")"
+    <img class="cliwe-top-right-decoration cliwe-show-in-pin-board" src="@assetsAt("cliwe-icons/delete.png")"
          onclick="var div = $(this).parent(); div.remove()">
     @content
 </div>
