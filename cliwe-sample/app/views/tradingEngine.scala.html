@@ -69,10 +69,10 @@ var refreshHandle = setInterval(
                     oldBidPrice = bidPrice;
                     formatConditionally(oldAskPrice, askPrice, $("#ask-side-" + "@objectId"));
                     oldAskPrice = askPrice;
-                    $("#bid-" + "@objectId").text(bidPrice);
-                    $("#ask-" + "@objectId").text(askPrice);
-                    $("#money-" + "@objectId").val(moneyPosition);
-                    $("#asset-" + "@objectId").val(assetPosition);
+                    $("#bid-" + "@objectId").text(bidPrice.toFixed(3));
+                    $("#ask-" + "@objectId").text(askPrice.toFixed(3));
+                    $("#money-" + "@objectId").val(moneyPosition.toFixed(2));
+                    $("#asset-" + "@objectId").val(assetPosition.toFixed(0));
                 }
             );
         }
