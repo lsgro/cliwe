@@ -102,15 +102,26 @@
             return commandBuffer.length === 0 || commandBuffer.length === 1 && commandBuffer[0].find(".cliwe-char").length === 0
         }
 
-        function processKey(event) {
-            if (event.target.tagName === "BODY" && !event.ctrlKey) {
-                var charCode = event.which;
-                if (completionDialog !== null && charCode === 13) {
-                    if (selectedCompletionIndex > -1) {
-                        appendCompletionToCommandBuffer();
-                    }
-                    killCompletionDialog();
+        function processEnterKey(ctrlKey) {
+            if (completionDialog !== null) {
+                if (selectedCompletionIndex > -1) {
+                    appendCompletionToCommandBuffer();
+                }
+                killCompletionDialog();
+            } else {
+                if (ctrlKey) {
+                    processChar(12); // send a '\f'
                 } else {
+                    processChar(13);
+                }
+            }
+            event.preventDefault();
+        }
+
+        function processKey(event) {
+            if ((event.target.tagName === "BODY" || event.target.className === "cliwe-terminal" /* IE */) && !event.ctrlKey) {
+                var charCode = event.which;
+                if (charCode >= 32) { // exclude most control codes
                     processChar(charCode);
                 }
                 event.preventDefault();
@@ -118,13 +129,10 @@
         }
 
         function processSpecialKey(event) {
-            if (event.target.tagName === "BODY") {
+            if (event.target.tagName === "BODY" || event.target.className === "cliwe-terminal" /* IE */) {
                 switch (event.keyCode) {
-                    case 13: // ctrl + enter
-                        if (event.ctrlKey) {
-                            processChar(12); // send a '\f'
-                            event.preventDefault();
-                        }
+                    case 13: // enter
+                        processEnterKey(event.ctrlKey);
                         break;
                     case 32: // ctrl + space
                         if (event.ctrlKey) {
@@ -452,4 +460,3 @@
     };
 
 })( jQuery );
-
