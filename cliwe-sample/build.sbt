@@ -12,4 +12,4 @@ play.Project.playScalaSettings
 
 resolvers += Resolver.sonatypeRepo("public")
 
-libraryDependencies += "com.github.lsgro" % "cliwe_2.10" % "1.1.2"
+libraryDependencies += "com.github.lsgro" % "cliwe_2.10" % "1.1.3"
