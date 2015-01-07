@@ -119,7 +119,7 @@
         }
 
         function processKey(event) {
-            if ((event.target.tagName === "BODY" || event.target.className === "cliwe-terminal" /* IE */) && !event.ctrlKey) {
+            if (event.target.tagName === "BODY" || event.target.className === "cliwe-terminal" /* IE */) {
                 var charCode = event.which;
                 if (charCode >= 32) { // exclude most control codes
                     processChar(charCode);
