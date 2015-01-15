@@ -4,6 +4,8 @@
     var currentCharIndex = 0,
         caretElement = $("<span class='cliwe-caret'>&#x2038;</span>").css({ "position": "absolute", "color": "blue", top: "-3px" }),
         commandBuffer = [],
+        commandHistory = [],
+        commandHistoryIndex = 0,
         linePrompt = "&gt;&nbsp;",
         completions = [],
         completionDialog = null,
@@ -13,6 +15,7 @@
     $.fn.cliwe = function ( methodOrOptions ) {
 
         var terminalElem = this,
+            hiddenClipboardInput,
             methods = {
                 setLinePrompt: setLinePrompt,
                 resetCommandBuffer: resetCommandBuffer,
@@ -33,10 +36,15 @@
 
             $(document).on("keypress", processKey);
             $(document).on("keydown", processSpecialKey);
+            $(document).on("paste", processPasteEvent);
+            terminalElem.on("mouseup", processEndSelection); // when selection ends, copy selected text to hidden textarea
 
             setBlink(caretElement, 500);
 
             putPrompt(newLine());
+
+            hiddenClipboardInput = $("<textarea class='cliwe-hidden'></textarea>");
+            terminalElem.append(hiddenClipboardInput);
         }
 
         // public methods
@@ -119,7 +127,7 @@
         }
 
         function processKey(event) {
-            if (event.target.tagName === "BODY" || event.target.className === "cliwe-terminal" /* IE */) {
+            if (event.target.tagName === "BODY" || event.target.className === "cliwe-terminal" /* IE */ || event.target.className === "cliwe-hidden") {
                 var charCode = event.which;
                 if (charCode >= 32) { // exclude most control codes
                     processChar(charCode);
@@ -129,7 +137,8 @@
         }
 
         function processSpecialKey(event) {
-            if (event.target.tagName === "BODY" || event.target.className === "cliwe-terminal" /* IE */) {
+            if (event.target.tagName === "BODY" || event.target.className === "cliwe-terminal" /* IE */ || event.target.className === "cliwe-hidden") {
+                hiddenClipboardInput.focus().select(); // always enable hidden textarea when a key is pressed, to enable copying into it
                 switch (event.keyCode) {
                     case 13: // enter
                         processEnterKey(event.ctrlKey);
@@ -153,6 +162,14 @@
                         break;
                     case 39: // arrow right
                         moveRight();
+                        event.preventDefault();
+                        break;
+                    case 38: // arrow up
+                        commandHistoryUp();
+                        event.preventDefault();
+                        break;
+                    case 40: // arrow down
+                        commandHistoryDown();
                         event.preventDefault();
                         break;
                     case 9: // tab
@@ -180,6 +197,17 @@
             }
         }
 
+        function processPasteEvent() {
+            setTimeout(function() {
+                appendToCommandBuffer(hiddenClipboardInput.val());
+            }, 0);
+        }
+
+        function processEndSelection() {
+            var text = commandBufferText();
+            hiddenClipboardInput.val(text);
+        }
+
         function processChar(charCode) {
             if (charCode >= 10 && charCode <= 13) {
                 var endOfCommand = charCode === 12 || !options.multiLine; // if multiLine execute only on \f
@@ -193,7 +221,7 @@
                 } else {
                     character = String.fromCharCode(charCode);
                 }
-                putChar(character, getLastLine());
+                putChar(character, getCurrentLine());
                 processCommandBuffer();
             }
         }
@@ -269,26 +297,60 @@
             }
         }
 
+        function commandHistoryUp() {
+            if (commandHistoryIndex < commandHistory.length - 1) {
+                commandHistoryIndex++;
+                replaceCurrentLineWithHistory();
+            }
+        }
+
+        function commandHistoryDown() {
+            if (commandHistoryIndex >= 1) {
+                commandHistoryIndex--;
+                replaceCurrentLineWithHistory();
+            }
+        }
+
+        function replaceCurrentLineWithHistory() {
+            var historyLine = commandHistory[commandHistory.length - 1 - commandHistoryIndex].clone(),
+                numberOfLineSpans = historyLine.children().length;
+            getCurrentLine().remove();
+            terminalElem.append(historyLine);
+            setCurrentCharIndex(numberOfLineSpans - 1);
+            moveCaretToLine(historyLine);
+            commandBuffer[commandBuffer.length - 1] = historyLine;
+        }
+
         function putPrompt(line) {
             line.append("<span class='cliwe-prompt'>" + linePrompt + "</span>");
             setCurrentCharIndex(1);
         }
 
-        function getLastLine() {
+        function getCurrentLine() {
             return terminalElem.children(".cliwe-line").last();
         }
 
         function getCurrentCharSpan() {
-            return getLastLine().children().eq(currentCharIndex);
+            return getCurrentLine().children().eq(currentCharIndex);
         }
 
         function newLine() {
-            var line = $("<div></div>").addClass("cliwe-line cliwe-medium");
+            var currentLine = getCurrentLine(),
+                line = $("<div></div>").addClass("cliwe-line cliwe-medium");
+            if (currentLine !== undefined) {
+                commandHistory[commandHistory.length - 1] = currentLine; // use always actual line as latest in history
+            }
             terminalElem.append(line);
+            moveCaretToLine(line);
+            commandBuffer.push(line);
+            commandHistory.push(line); // push empty new line to history
+            commandHistoryIndex = 0;
+            return line;
+        }
+
+        function moveCaretToLine(line) {
             caretElement.detach();
             line.append(caretElement);
-            commandBuffer.push(line);
-            return line;
         }
 
         function setCurrentCharIndex(charIndex) {
